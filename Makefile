@@ -4,7 +4,7 @@
 
 # Core source
 GPGX_REPO   := https://github.com/libretro/Genesis-Plus-GX.git
-GPGX_HASH   := b72b8c967adc50311dc3bb700c0818518bee74ef
+GPGX_HASH   := fa4dca561e08d5be9077419f7b255e1da213ed21
 CORE_SONAME := genesis_plus_gx_libretro.so
 
 # Pak metadata
