@@ -5,6 +5,7 @@
 # Core source
 GPGX_REPO   := https://github.com/libretro/Genesis-Plus-GX.git
 GPGX_HASH   := fa4dca561e08d5be9077419f7b255e1da213ed21
+GPGX_SHORT  := $(shell printf '%.7s' $(GPGX_HASH))
 CORE_SONAME := genesis_plus_gx_libretro.so
 
 # Pak metadata
@@ -40,6 +41,9 @@ MY355_FLAGS  := -mcpu=cortex-a55 -mtune=cortex-a55
 # NOTE: CPU-specific flags go via FLAGS= (appended to CFLAGS inside the Makefile).
 # We must include -D_7ZIP_ST and -DZSTD_DISABLE_ASM because the Makefile.common
 # sets them via FLAGS+=, which is overridden by our command-line FLAGS=.
+# GIT_VERSION is pinned rather than read with git inside the container, which
+# refuses a checkout owned by another user (as on CI runners) and would drop
+# the suffix from the core's reported version and change the binary.
 COMMON_FLAGS := platform=unix FRONTEND_SUPPORTS_RGB565=1 HAVE_CHD=1
 GPGX_FLAGS   := -D_7ZIP_ST -DZSTD_DISABLE_ASM
 
@@ -104,6 +108,7 @@ define docker_build
 			make -f Makefile.libretro clean && \
 			make -f Makefile.libretro \
 				$(COMMON_FLAGS) \
+				GIT_VERSION="\" $(GPGX_SHORT)\"" \
 				FLAGS="$(GPGX_FLAGS) $(2) -fomit-frame-pointer -ffast-math" \
 				-j$(JOBS) && \
 			$${CROSS_COMPILE}strip $(CORE_SONAME) \
