@@ -1,0 +1,62 @@
+name: Build
+
+# Builds the universal core and packages GPGX.pak.zip, the single archive
+# Pak Store installs on tg5040, tg5050, my355, and h700.
+on:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      version:
+        description: Version string read from pak.json
+        value: ${{ jobs.universal.outputs.version }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  universal:
+    name: Universal core (GPGX.pak.zip)
+    # arm64 runs the same linux/arm64 variant of the pinned toolchain image as
+    # local builds on Apple Silicon. Free for public repositories.
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version from pak.json
+        id: meta
+        run: |
+          version="$(jq -er .version pak.json)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Building GPGX $version"
+
+      # make package also runs scripts/verify-core.sh and asserts the archive
+      # layout, so a core that some firmware cannot load fails here.
+      - name: Build and package
+        run: make package
+
+      - name: Summarize package
+        run: |
+          set -euo pipefail
+          {
+            echo "### GPGX ${{ steps.meta.outputs.version }}"
+            echo '```'
+            unzip -Z1 build/release/GPGX.pak.zip | sort
+            echo
+            sha256sum build/universal/genesis_plus_gx_libretro.so build/release/GPGX.pak.zip
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload GPGX.pak.zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: GPGX-pak-zip
+          path: build/release/GPGX.pak.zip
+          if-no-files-found: error

@@ -79,6 +79,12 @@ Supported ROM extensions: `.md`, `.gen`, `.sms`, `.gg`, `.sg`, `.68k`, `.bin`, `
 
 > **Mega CD note:** CD games require BIOS files (`bios_CD_E.bin`, `bios_CD_J.bin`, `bios_CD_U.bin`) placed in the `Bios/GPGX/` folder on your SD card.
 
+## Releasing
+
+The **Build** workflow runs `make package` on every pull request and attaches `GPGX.pak.zip` to the run as an artifact.
+
+To publish, bump `version` in `pak.json`, add a `changelog` entry for that version, and merge to `main`. The **Release** workflow builds the archive and, if no release with that tag exists yet, creates one with `GPGX.pak.zip` attached and the changelog entry as its notes.
+
 ## Core Version
 
 Genesis Plus GX is pinned to commit [`fa4dca5`](https://github.com/libretro/Genesis-Plus-GX/commit/fa4dca561e08d5be9077419f7b255e1da213ed21) for reproducible builds.
