@@ -1,18 +1,20 @@
 {
   "name": "GPGX",
-  "version": "v1.0.0",
+  "version": "v1.1.0",
   "type": "EMU",
   "description": "Genesis Plus GX libretro core for Sega Genesis/Mega Drive, Master System, Game Gear, SG-1000, and Sega/Mega CD.",
   "author": "Helaas",
   "repo_url": "https://github.com/Helaas/nextui-gppx-pak",
-  "release_filename": "GPGX.pakz",
+  "release_filename": "GPGX.pak.zip",
   "screenshots": [],
   "platforms": [
     "tg5040",
     "tg5050",
-    "my355"
+    "my355",
+    "h700"
   ],
   "changelog": {
+    "v1.1.0": "Adds H700 (Anbernic) support. One core build now serves every platform and ships as a single GPGX.pak.zip.",
     "v1.0.0": "Initial release. Genesis Plus GX core pinned to upstream fa4dca5."
   }
 }

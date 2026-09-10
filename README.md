@@ -6,22 +6,31 @@ Genesis Plus GX is an accurate Sega 8/16-bit emulator supporting Genesis/Mega Dr
 
 ## Supported Platforms
 
-| Platform | Device | Toolchain |
-|----------|--------|-----------|
-| tg5040 | Trimui Smart Pro | `ghcr.io/loveretro/tg5040-toolchain:latest` |
-| tg5050 | Trimui Smart Pro S | `ghcr.io/loveretro/tg5050-toolchain:latest` |
-| my355 | Anbernic MY355 | `ghcr.io/loveretro/my355-toolchain:latest` |
+| Platform | Device |
+|----------|--------|
+| tg5040 | TrimUI Brick / Smart Pro |
+| tg5050 | TrimUI Smart Pro S |
+| my355 | Miyoo Flip |
+| h700 | Anbernic H700 devices |
+
+One core build serves every platform. It is compiled with the pinned `ghcr.io/loveretro/tg5040-toolchain` image, whose glibc 2.28 sysroot is older than every supported firmware, and tuned for Cortex-A53 so it runs on both A53 and A55 devices.
 
 ## Building
 
 Requires Docker.
 
 ```sh
-# Build for all platforms and create .pakz
+# Build the universal core and create build/release/GPGX.pak.zip
 make package
 
-# Build for a single platform
-make tg5040
+# Build the universal core only
+make universal
+
+# Check the core's architecture, RPATH, and glibc ceiling
+make verify
+
+# Optional legacy per-platform builds, kept as regression checks
+make matrix
 
 # Clean build artifacts (preserves cached source)
 make clean
@@ -30,27 +39,22 @@ make clean
 make distclean
 ```
 
+`make package` verifies the core and asserts that `launch.sh`, `default.cfg`, `pak.json`, and `genesis_plus_gx_libretro.so` sit at the archive root.
+
 ## Installation
 
 ### Via Pak Store (Recommended)
 
 1. Open **Pak Store** on your NextUI device.
 2. Search for **GPGX** and tap **Install**.
-3. Pak Store will download the latest `GPGX.pakz` release and place the pak in the correct `Emus/<platform>/GPGX.pak/` directory for your device.
+3. Pak Store downloads `GPGX.pak.zip` and extracts it into `Emus/<platform>/GPGX.pak/` for your device.
 
 ### Manual Installation
 
-1. Download `GPGX.pakz` from the [latest release](https://github.com/Helaas/nextui-gppx-pak/releases).
-2. Extract the archive to the root of your SD card. It will create the correct directory structure:
+1. Download `GPGX.pak.zip` from the [latest release](https://github.com/Helaas/nextui-gppx-pak/releases).
+2. Extract the contents of the archive into `Emus/<platform>/GPGX.pak/` on your SD card, replacing `<platform>` with `tg5040`, `tg5050`, `my355`, or `h700`.
 
-   ```
-   Emus/
-   ├── tg5040/GPGX.pak/
-   ├── tg5050/GPGX.pak/
-   └── my355/GPGX.pak/
-   ```
-
-   Each `GPGX.pak/` folder contains `launch.sh`, `default.cfg`, `LICENSE`, and the stripped `genesis_plus_gx_libretro.so` core for that platform.
+   The archive has no enclosing folder, so create `GPGX.pak/` first. It contains `launch.sh`, `default.cfg`, `pak.json`, `LICENSE`, and the stripped `genesis_plus_gx_libretro.so` core.
 
 ## ROMs
 
